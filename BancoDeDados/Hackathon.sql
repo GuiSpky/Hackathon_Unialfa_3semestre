@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Tempo de geração: 18/06/2024 às 03:09
+-- Tempo de geração: 19/06/2024 às 00:27
 -- Versão do servidor: 10.4.28-MariaDB
 -- Versão do PHP: 8.2.4
 
@@ -33,7 +33,9 @@ CREATE TABLE `agenda` (
   `idIdoso` int(11) NOT NULL,
   `dataVisita` date NOT NULL,
   `horaVisita` time NOT NULL,
-  `info` varchar(200) NOT NULL
+  `info` varchar(200) NOT NULL,
+  `IdVacina` int(11) NOT NULL,
+  `DataAplicacao` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -45,11 +47,20 @@ CREATE TABLE `agenda` (
 CREATE TABLE `idoso` (
   `id` int(11) NOT NULL,
   `nome` varchar(100) NOT NULL,
-  `cpf` int(11) NOT NULL,
+  `cpf` varchar(11) NOT NULL,
   `telefone` varchar(15) NOT NULL,
   `endereco` varchar(100) NOT NULL,
-  `historicoMedico` varchar(300) NOT NULL
+  `historicoMedico` varchar(300) NOT NULL,
+  `DataNascimento` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `idoso`
+--
+
+INSERT INTO `idoso` (`id`, `nome`, `cpf`, `telefone`, `endereco`, `historicoMedico`, `DataNascimento`) VALUES
+(1, 'Andre Luiz Villar', '09463842900', '44123456789', 'Chacará Alto Alegre, Zona rural', 'Retirada do apêndice 2003. Alergico a Morfina. Cirurgia no joelho devido desgaste da cartilagem', '1951-08-27'),
+(2, 'Janete Maria De Jesus', '89204694904', '44638499163', 'Rua Java, Vila Rural II', 'Osteoporose, Artrite, Hernia de Disco.', '1937-04-18');
 
 -- --------------------------------------------------------
 
@@ -59,8 +70,16 @@ CREATE TABLE `idoso` (
 
 CREATE TABLE `medico` (
   `ID` int(11) NOT NULL,
-  `nome` int(11) NOT NULL
+  `nome` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `medico`
+--
+
+INSERT INTO `medico` (`ID`, `nome`) VALUES
+(1, 'Joana Darci de Moreira'),
+(2, 'Antonio Bernardes ');
 
 -- --------------------------------------------------------
 
@@ -71,10 +90,17 @@ CREATE TABLE `medico` (
 CREATE TABLE `vacinas` (
   `id` int(11) NOT NULL,
   `nomeVacina` varchar(100) NOT NULL,
-  `dataInicioCampanha` date NOT NULL,
-  `idIdoso` int(11) NOT NULL,
-  `vacinado` tinyint(1) NOT NULL
+  `dataInicioCampanha` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `vacinas`
+--
+
+INSERT INTO `vacinas` (`id`, `nomeVacina`, `dataInicioCampanha`) VALUES
+(2, 'Influenza', '2024-03-18'),
+(3, 'Hepatite B', '2024-01-01'),
+(4, 'Dupla adulto (difteria e tétano) – dT', '2024-01-01');
 
 --
 -- Índices para tabelas despejadas
@@ -86,7 +112,8 @@ CREATE TABLE `vacinas` (
 ALTER TABLE `agenda`
   ADD PRIMARY KEY (`id`),
   ADD KEY `fk_idMedico` (`idMedico`),
-  ADD KEY `fk_idIdoso` (`idIdoso`);
+  ADD KEY `fk_idIdoso` (`idIdoso`),
+  ADD KEY `fk_idVacina` (`IdVacina`);
 
 --
 -- Índices de tabela `idoso`
@@ -104,8 +131,7 @@ ALTER TABLE `medico`
 -- Índices de tabela `vacinas`
 --
 ALTER TABLE `vacinas`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_Idoso` (`idIdoso`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- AUTO_INCREMENT para tabelas despejadas
@@ -121,19 +147,19 @@ ALTER TABLE `agenda`
 -- AUTO_INCREMENT de tabela `idoso`
 --
 ALTER TABLE `idoso`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de tabela `medico`
 --
 ALTER TABLE `medico`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de tabela `vacinas`
 --
 ALTER TABLE `vacinas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Restrições para tabelas despejadas
@@ -144,13 +170,8 @@ ALTER TABLE `vacinas`
 --
 ALTER TABLE `agenda`
   ADD CONSTRAINT `fk_idIdoso` FOREIGN KEY (`idIdoso`) REFERENCES `idoso` (`id`),
-  ADD CONSTRAINT `fk_idMedico` FOREIGN KEY (`idMedico`) REFERENCES `medico` (`ID`);
-
---
--- Restrições para tabelas `vacinas`
---
-ALTER TABLE `vacinas`
-  ADD CONSTRAINT `fk_Idoso` FOREIGN KEY (`idIdoso`) REFERENCES `idoso` (`id`);
+  ADD CONSTRAINT `fk_idMedico` FOREIGN KEY (`idMedico`) REFERENCES `medico` (`ID`),
+  ADD CONSTRAINT `fk_idVacina` FOREIGN KEY (`IdVacina`) REFERENCES `vacinas` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
