@@ -6,7 +6,7 @@ const router = Router()
 
 router.get('/', async(req, res) =>{
     const [query] = await connection.execute('SELECT * FROM idoso');
-    return res.status(201).json(query);
+    res.status(201).json(query);
 })
 
 export default router;
