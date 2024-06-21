@@ -3,7 +3,6 @@ import allItens from './allitens';
 import connection from './connection';
 import routes from './routers'
 
-
 const app = express();
 
 app.use(express.json());
