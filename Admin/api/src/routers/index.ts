@@ -1,10 +1,10 @@
 import { Router } from 'express'
-import usuario from './usuarios'
+import idosos from './idosos'
 import agenda from './agenda'
 
 const routes = Router()
 
-routes.use('/usuario', usuario)
+routes.use('/idoso', idosos)
 routes.use('/agenda', agenda)
 
 export default routes

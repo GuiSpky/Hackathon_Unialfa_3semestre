@@ -1,7 +1,6 @@
 import express, { Router, json } from 'express'
 import knex from '../database/knex'
 import {z} from 'zod';
-import knexConfig from '../../knexfile';
 import AppError from '../utils/AppError';
 
 const router = Router()
