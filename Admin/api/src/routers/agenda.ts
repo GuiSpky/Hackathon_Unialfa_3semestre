@@ -1,59 +1,75 @@
 import express, { Router, json } from 'express'
-import allItens from '../allitens';
-import connection from '../connection';
+import knex from '../database/knex'
 import {z} from 'zod';
-import bodyParser from 'body-parser';
-
+import knexConfig from '../../knexfile';
+import AppError from '../utils/AppError';
 
 const router = Router()
 
+// router.get('/', async(req, res) =>{
+//     const [query] = await connection.execute('SELECT * FROM agenda');
+//     return res.status(201).json(query);
+// })
+
 router.get('/', async(req, res) =>{
-    const [query] = await connection.execute('SELECT * FROM agenda');
-    return res.status(201).json(query);
-})
+    knex("agenda").then((agenda) =>{
+        console.log(agenda)
+        res.json({agenda})
+})})
 
 router.post('/', async(req,res)=>{
-    const registerBodySchema = z.object({
-        agente: z.string(), 
-        idoso: z.string(), 
-        data: z.string(), 
-        hora: z.string(), 
+    const registerBodySchema = z.object({ // recebe os dados do php
+        idAgente: z.string(), 
+        idIdoso: z.string(), 
+        dataVisita: z.string(), 
+        horaVisita: z.string(), 
         info: z.string(), 
-        vacina: z.string()
+        idVacina: z.string()
     })
-
     const objSalvar = registerBodySchema.parse(req.body)
 
-    const [query] = await connection.execute(
-        "insert into agenda (id, idMedico, idIdoso, dataVisita, horaVisita, info, IdVacina,"+
-        " DataAplicacao) VALUES (NULL,'"
-        +objSalvar?.agente+"','"+objSalvar?.idoso+"','"+objSalvar?.data+"','"+objSalvar?.hora+"','"
-        +objSalvar?.info+"','"+objSalvar?.vacina+"', NULL);");
-        res.json({message:"Deu certo!"});
+    await knex('agenda').insert(objSalvar) // salva no mysql
+    res.json({mensagem: "Agendado com sucesso!"})
 })
 
-router.put('/', async(req,res)=>{
-    const registerBodySchema = z.object({
-        agente: z.string(), 
-        idoso: z.string(), 
-        data: z.string(), 
-        hora: z.string(), 
-        info: z.string(), 
-        vacina: z.string()
-    })
+router.put('/:id', async(req,res)=>{
+    const {id} = req.params
 
+    const registerBodySchema = z.object({ // recebe os dados do php
+        idAgente: z.string(), 
+        idIdoso: z.string(), 
+        dataVisita: z.string(), 
+        horaVisita: z.string(), 
+        info: z.string(), 
+        idVacina: z.string(),
+        DataAplicacao: z.string().nullable()
+    })
     const objSalvar = registerBodySchema.parse(req.body)
-    const [query] = await connection.execute('SELECT * FROM agenda');
-    
+
+    let visita = await knex('agenda').where({id}).first()
+
+    visita = {
+        ...visita,
+        ...objSalvar
+    }
+
+    await knex('agenda').where({id: visita.id}).update(visita)
+
+    return res.json({message: "Editado visita com sucesso!"})
 })
 
-router.delete('/', async(req,res)=>{
-    const registerBodySchema = z.object({
-        agenda: z.string()})
+router.delete('/:id', async(req,res)=>{
+    const {id} = req.params
+
+    let visita = await knex('agenda').where({id}).first()
+
+    if(!visita?.id){
+        throw new AppError("Visita não encontrada")
+    }
+
+    await knex('agenda').where({id}).delete()
     
-    const objSalvar = registerBodySchema.parse(req.body)
-    await connection.execute("delete * FROM agenda where id='"+objSalvar.agenda+"'");
-    
+    return res.json({message: 'Visita deletada'})
 })
 
 export default router;
