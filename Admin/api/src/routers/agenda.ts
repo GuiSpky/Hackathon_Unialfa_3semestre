@@ -12,7 +12,6 @@ const router = Router()
 
 router.get('/', async(req, res) =>{
     knex("agenda").then((agenda) =>{
-        console.log(agenda)
         res.json({agenda})
 })})
 

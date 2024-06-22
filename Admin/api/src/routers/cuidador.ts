@@ -5,23 +5,19 @@ import AppError from '../utils/AppError';
 const router = Router()
 
 router.get('/', async(req, res) =>{
-    knex("idoso").then((agenda) =>{
-        res.json({agenda})
+    knex("cuidador").then((cuidadores) =>{
+        res.json({cuidadores})
     })
 })
 
 router.post('/', async(req,res)=>{
     const registerBodySchema = z.object({ // recebe os dados do php
         nome: z.string(), 
-        cpf: z.string(), 
-        telefone: z.string(), 
-        endereco: z.string(), 
-        historicoMedico: z.string(), 
-        DataNascimento: z.string()
+        idIdoso: z.string()
     })
     const objSalvar = registerBodySchema.parse(req.body)
 
-    await knex('idoso').insert(objSalvar) // salva no mysql
+    await knex('cuidador').insert(objSalvar) // salva no mysql
     res.json({mensagem: "Criado com sucesso!"})
 })
 
@@ -30,22 +26,18 @@ router.put('/:id', async(req,res)=>{
 
     const registerBodySchema = z.object({ // recebe os dados do php
         nome: z.string(), 
-        cpf: z.string(), 
-        telefone: z.string(), 
-        endereco: z.string(), 
-        historicoMedico: z.string(), 
-        DataNascimento: z.string()
+        idIdoso: z.string()
     })
     const objSalvar = registerBodySchema.parse(req.body)
 
-    let idoso = await knex('idoso').where({id}).first()
+    let cuidador = await knex('cuidador').where({id}).first()
 
-     idoso = {
-        ...idoso,
+    cuidador = {
+        ...cuidador,
         ...objSalvar
     }
 
-    await knex('idoso').where({id: idoso.id}).update(idoso)
+    await knex('cuidador').where({id: cuidador.id}).update(cuidador)
 
     return res.json({message: "Editado cadastro com sucesso!"})
 })
@@ -53,13 +45,13 @@ router.put('/:id', async(req,res)=>{
 router.delete('/:id', async(req,res)=>{
     const {id} = req.params
 
-    let idoso = await knex('idoso').where({id}).first()
+    let cuidador = await knex('cuidador').where({id}).first()
 
-    if(!idoso?.id){
+    if(!cuidador?.id){
         throw new AppError("Visita não encontrada")
     }
 
-    await knex('idoso').where({id}).delete()
+    await knex('cuidador').where({id}).delete()
     
     return res.json({message: 'Cadastro deletado'})
 })
