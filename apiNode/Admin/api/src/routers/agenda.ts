@@ -5,11 +5,6 @@ import AppError from '../utils/AppError';
 
 const router = Router()
 
-// router.get('/', async(req, res) =>{
-//     const [query] = await connection.execute('SELECT * FROM agenda');
-//     return res.status(201).json(query);
-// })
-
 router.get('/', async(req, res) =>{
     knex("agenda").then((agenda) =>{
         res.json({agenda})
